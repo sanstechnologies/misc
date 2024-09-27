@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encrypt/Decrypt</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      text-align: center;
+    }
+    .large-textbox {
+      width: 400px;
+      height: 40px;
+    }
+    .icon {
+      cursor: pointer;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Encrypt/Decrypt Tool</h1>
+    <div>
+      <input type="text" id="inputText" class="large-textbox" placeholder="Enter text here">
+      <span class="icon" id="copyInputText">📋</span>
+      <span class="icon" id="pasteInputText">📥</span>
+    </div>
+    <br/>
+    <input type="text" id="keyText" class="large-textbox" placeholder="Enter key here">
+    <span class="icon" id="pasteKeyText">📥</span>
+    <br/>
+    <br/>
+    <div>
+      <input type="text" id="value" class="large-textbox" placeholder="Result">
+      <span class="icon" id="copyValue">📋</span>
+      <span class="icon" id="pasteValue">📥</span>
+    </div>
+    <br/>
+    <button id="encryptButton">Encrypt</button>
+    <button id="decryptButton">Decrypt</button>
+  </div>
+  <script>
+      function vigenereEncrypt(text, key) {
+          let result = '';
+          key = key.toLowerCase();
+          for (let i = 0, j = 0; i < text.length; i++) {
+              let charCode = text.charCodeAt(i);
+              if (charCode >= 32 && charCode <= 126) { // Printable ASCII characters
+                  result += String.fromCharCode((charCode - 32 + (key.charCodeAt(j % key.length) - 97)) % 95 + 32);
+                  j++;
+              } else {
+                  result += text.charAt(i); // Non-printable characters remain the same
+              }
+          }
+          return result;
+      }
+  
+      function vigenereDecrypt(text, key) {
+          let result = '';
+          key = key.toLowerCase();
+          for (let i = 0, j = 0; i < text.length; i++) {
+              let charCode = text.charCodeAt(i);
+              if (charCode >= 32 && charCode <= 126) { // Printable ASCII characters
+                  result += String.fromCharCode((charCode - 32 - (key.charCodeAt(j % key.length) - 97) + 95) % 95 + 32);
+                  j++;
+              } else {
+                  result += text.charAt(i); // Non-printable characters remain the same
+              }
+          }
+          return result;
+      }
+  
+      function copyToClipboard(elementId) {
+          const text = document.getElementById(elementId).value;
+          navigator.clipboard.writeText(text).then(() => {
+          }).catch(err => {
+              console.error('Failed to copy: ', err);
+          });
+      }
+  
+      function pasteFromClipboard(elementId) {
+          navigator.clipboard.readText().then(text => {
+              document.getElementById(elementId).value = text;
+          }).catch(err => {
+              console.error('Failed to paste: ', err);
+          });
+      }
+  
+      document.getElementById('encryptButton').addEventListener('click', function() {
+          const inputText = document.getElementById('inputText').value;
+          const keyText = document.getElementById('keyText').value;
+          const encryptedText = vigenereEncrypt(inputText, keyText);
+          document.getElementById('value').value = encryptedText;
+      });
+  
+      document.getElementById('decryptButton').addEventListener('click', function() {
+          const inputText = document.getElementById('inputText').value;
+          const keyText = document.getElementById('keyText').value;
+          const decryptedText = vigenereDecrypt(inputText, keyText);
+          document.getElementById('value').value = decryptedText;
+      });
+  
+      document.getElementById('copyInputText').addEventListener('click', function() {
+          copyToClipboard('inputText');
+      });
+  
+      document.getElementById('copyValue').addEventListener('click', function() {
+          copyToClipboard('value');
+      });
+      document.getElementById('pasteInputText').addEventListener('click', function() {
+          pasteFromClipboard('inputText');
+      });
+      document.getElementById('pasteValue').addEventListener('click', function() {
+          pasteFromClipboard('value');
+      });
+      document.getElementById('pasteKeyText').addEventListener('click', function() {
+          pasteFromClipboard('keyText');
+      });
+  </script>
+</body>
+</html>
